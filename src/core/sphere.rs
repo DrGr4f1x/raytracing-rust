@@ -3,6 +3,7 @@ use super::ray::*;
 use super::hitable::*;
 use std::f32;
 
+#[derive(Clone, Copy, Debug)]
 pub struct Sphere {
     pub center: Vec3,
     pub radius: f32,

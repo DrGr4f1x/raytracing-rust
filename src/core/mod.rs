@@ -3,3 +3,4 @@ pub mod ray;
 pub mod hitable;
 pub mod sphere;
 pub mod hitable_list;
+pub mod camera;

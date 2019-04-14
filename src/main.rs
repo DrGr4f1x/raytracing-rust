@@ -1,6 +1,7 @@
 use std::fs::{File};
 use std::io::{BufWriter, Write};
 use std::f32;
+use rand::random;
 
 pub mod core;
 use crate::core::vec3::*;
@@ -8,6 +9,7 @@ use crate::core::ray::*;
 use crate::core::hitable::*;
 use crate::core::sphere::*;
 use crate::core::hitable_list::*;
+use crate::core::camera::*;
 
 fn color(r: Ray, world: &Hitable) -> Vec3 {
     let mut rec = HitRecord::new();
@@ -27,11 +29,7 @@ fn color(r: Ray, world: &Hitable) -> Vec3 {
 fn main() {
     let nx = 1280;
     let ny = 720;
-    
-    let lower_left_corner = Vec3::new(-2.0, -1.0, -1.0);
-    let horizontal = Vec3::new(4.0, 0.0, 0.0);
-    let vertical = Vec3::new(0.0, 2.0, 0.0);
-    let origin = Vec3::new(0.0, 0.0, 0.0);
+    let ns = 16;
 
     let mut world = HitableList::new();
     let sphere0 = Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5);
@@ -39,6 +37,7 @@ fn main() {
     world.list.push(Box::new(sphere0));
     world.list.push(Box::new(sphere1));
 
+    let cam = Camera::new();
 
     let file = File::create("image.ppm").expect("Unable to create file");
     let mut buf_writer = BufWriter::new(file);
@@ -46,11 +45,17 @@ fn main() {
 
     for j in (0..ny).rev() {
         for i in 0..nx {
-            let u: f32 = (i as f32) / (nx as f32);
-            let v: f32 = (j as f32) / (ny as f32);
-            let r = Ray::new(origin, lower_left_corner + u * horizontal + v * vertical);
+            let mut col = Vec3::new(0.0, 0.0, 0.0);
 
-            let col = color(r, &world);
+            for _s in 0..ns {
+                let u = ((i as f32) + random::<f32>()) / (nx as f32);
+                let v = ((j as f32) + random::<f32>()) / (ny as f32);
+                let r = cam.get_ray(u, v);
+                
+                col += color(r, &world);
+            }
+
+            col /= ns as f32;
 
             let ir : i32 = (255.99 * col.r()) as i32;
             let ig : i32 = (255.99 * col.g()) as i32;
