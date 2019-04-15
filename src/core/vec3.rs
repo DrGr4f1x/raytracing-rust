@@ -20,6 +20,18 @@ impl Vec3 {
         Vec3 { e: [1.0, 1.0, 1.0] }
     }
 
+    pub fn unit_x() -> Self {
+        Vec3 { e: [1.0, 0.0, 0.0] }
+    }
+
+    pub fn unit_y() -> Self {
+        Vec3 { e: [0.0, 1.0, 0.0] }
+    }
+
+    pub fn unit_z() -> Self {
+        Vec3 { e: [0.0, 0.0, 1.0] }
+    }
+
     pub fn x(&self) -> f32 {
         self.e[0]
     }
@@ -58,6 +70,11 @@ impl Vec3 {
         self.e[1] /= len;
         self.e[2] /= len;
     }
+}
+
+pub fn unit_vector(v: Vec3) -> Vec3 {
+    let len = v.length();
+    Vec3 { e: [v.x() / len, v.y() / len, v.z() / len] }
 }
 
 impl Add for Vec3 {
@@ -227,6 +244,6 @@ pub fn dot(lhs: Vec3, rhs: Vec3) -> f32 {
 pub fn cross(lhs: Vec3, rhs: Vec3) -> Vec3 {
     Vec3 { e: [
         lhs.y()*rhs.z() - lhs.z()*rhs.y(), 
-        -(lhs.x()*rhs.z() - lhs.z()*rhs.z()), 
+        lhs.z()*rhs.x() - lhs.x()*rhs.z(), 
         lhs.x()*rhs.y() - lhs.y()*rhs.x() ] }
 }

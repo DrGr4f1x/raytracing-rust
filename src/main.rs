@@ -52,7 +52,14 @@ fn main() {
     world.list.push(Box::new(sphere3));
     world.list.push(Box::new(sphere4));
 
-    let cam = Camera::new();
+    let fovy :f32 = 20.0;
+    let aspect = (nx as f32) / (ny as f32);
+    let pos = Vec3::new(3.0, 3.0, 2.0);
+    let target = Vec3::new(0.0, 0.0, -1.0);
+    let up = Vec3::unit_y();
+    let dist_to_focus = (pos - target).length();
+    let aperture = 2.0;
+    let cam = Camera::look_at(pos, target, up, fovy, aspect, aperture, dist_to_focus);
 
     let file = File::create("image.ppm").expect("Unable to create file");
     let mut buf_writer = BufWriter::new(file);
@@ -79,5 +86,6 @@ fn main() {
 
             buf_writer.write_fmt(format_args!("{} {} {}\n", ir, ig, ib));
         }
+        
     }
 }

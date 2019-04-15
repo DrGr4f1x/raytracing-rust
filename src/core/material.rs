@@ -88,12 +88,12 @@ impl Dielectric {
 
 impl Scatterable for Dielectric {
     fn scatter(&self, r_in: &Ray, rec: &HitRecord, attenuation: &mut Vec3, scattered: &mut Ray) -> bool {
-        let mut outward_normal = Vec3::zero();
+        let outward_normal: Vec3;
         let reflected = reflect(r_in.direction(), rec.normal);
-        let mut ni_over_nt : f32 = 0.0;
+        let ni_over_nt: f32;
         *attenuation = Vec3::one();
-        let mut reflect_prob : f32 = 0.0;
-        let mut cosine : f32 = 0.0;
+        let reflect_prob: f32;
+        let cosine: f32;
         if dot(r_in.direction(), rec.normal) > 0.0 {
             outward_normal = -1.0 * rec.normal;
             ni_over_nt = self.ref_idx;
