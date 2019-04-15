@@ -41,14 +41,16 @@ fn main() {
     let ns = 16;
 
     let mut world = HitableList::new();
-    let sphere0 = Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5, Material::Lambertian(Lambertian::new(Vec3::new(0.8, 0.3, 0.3))));
-    let sphere1 = Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0, Material::Lambertian(Lambertian::new(Vec3::new(0.8, 0.8, 0.0))));
-    let sphere2 = Sphere::new(Vec3::new(1.0, 0.0, -1.0), 0.5, Material::Metal(Metal::new(Vec3::new(0.8, 0.6, 0.2))));
-    let sphere3 = Sphere::new(Vec3::new(-1.0, 0.0, -1.0), 0.5, Material::Metal(Metal::new(Vec3::new(0.8, 0.8, 0.8))));
+    let sphere0 = Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5, Material::as_lambertian(Vec3::new(0.8, 0.3, 0.3)));
+    let sphere1 = Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0, Material::as_lambertian(Vec3::new(0.8, 0.8, 0.0)));
+    let sphere2 = Sphere::new(Vec3::new(1.0, 0.0, -1.0), 0.5, Material::as_metal(Vec3::new(0.8, 0.6, 0.2)));
+    let sphere3 = Sphere::new(Vec3::new(-1.0, 0.0, -1.0), 0.5, Material::as_dielectric(1.5));
+    let sphere4 = Sphere::new(Vec3::new(-1.0, 0.0, -1.0), -0.45, Material::as_dielectric(1.5));
     world.list.push(Box::new(sphere0));
     world.list.push(Box::new(sphere1));
     world.list.push(Box::new(sphere2));
     world.list.push(Box::new(sphere3));
+    world.list.push(Box::new(sphere4));
 
     let cam = Camera::new();
 
