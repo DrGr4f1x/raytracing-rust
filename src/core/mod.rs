@@ -6,3 +6,4 @@ pub mod hitable_list;
 pub mod camera;
 pub mod sampling;
 pub mod material;
+pub mod image;

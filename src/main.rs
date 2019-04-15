@@ -11,6 +11,7 @@ use crate::core::sphere::*;
 use crate::core::hitable_list::*;
 use crate::core::camera::*;
 use crate::core::material::*;
+use crate::core::image::*;
 
 
 fn color(r: Ray, world: &Hitable, depth: i32) -> Vec3 {
@@ -83,13 +84,12 @@ fn main() {
     let pos = Vec3::new(13.0, 2.0, 3.0);
     let target = Vec3::new(0.0, 0.0, 0.0);
     let up = Vec3::unit_y();
-    let dist_to_focus = 5.0;
+    let dist_to_focus = (pos - target).length();
     let aperture = 0.1;
     let cam = Camera::look_at(pos, target, up, fovy, aspect, aperture, dist_to_focus);
 
-    let file = File::create("image.ppm").expect("Unable to create file");
-    let mut buf_writer = BufWriter::new(file);
-    buf_writer.write_fmt(format_args!("P3\n{} {}\n255\n", nx, ny));
+    // Output image
+    let mut image = Image::new(nx, ny);
 
     for j in (0..ny).rev() {
         for i in 0..nx {
@@ -106,12 +106,9 @@ fn main() {
             col /= ns as f32;
             col = Vec3::new(f32::sqrt(col.r()), f32::sqrt(col.g()), f32::sqrt(col.b()));
 
-            let ir : i32 = (255.99 * col.r()) as i32;
-            let ig : i32 = (255.99 * col.g()) as i32;
-            let ib : i32 = (255.99 * col.b()) as i32;
-
-            buf_writer.write_fmt(format_args!("{} {} {}\n", ir, ig, ib));
+            image.set_pixel(i, j, col);
         }
-        
     }
+
+    image.save_as("image.ppm");
 }
