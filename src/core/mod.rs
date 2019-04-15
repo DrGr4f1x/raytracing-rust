@@ -4,3 +4,5 @@ pub mod hitable;
 pub mod sphere;
 pub mod hitable_list;
 pub mod camera;
+pub mod sampling;
+pub mod material;

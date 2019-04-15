@@ -21,10 +21,7 @@ impl Hitable for HitableList {
             if self.list[i].hit(r, t_min, closest_so_far, &mut temp_rec) {
                 hit_anything = true;
                 closest_so_far = temp_rec.t;
-
-                rec.t = temp_rec.t;
-                rec.p = temp_rec.p;
-                rec.normal = temp_rec.normal;
+                *rec = temp_rec;
             }
         }
 
