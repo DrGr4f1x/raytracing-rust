@@ -41,24 +41,50 @@ fn main() {
     let ns = 16;
 
     let mut world = HitableList::new();
-    let sphere0 = Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5, Material::as_lambertian(Vec3::new(0.8, 0.3, 0.3)));
-    let sphere1 = Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0, Material::as_lambertian(Vec3::new(0.8, 0.8, 0.0)));
-    let sphere2 = Sphere::new(Vec3::new(1.0, 0.0, -1.0), 0.5, Material::as_metal(Vec3::new(0.8, 0.6, 0.2)));
-    let sphere3 = Sphere::new(Vec3::new(-1.0, 0.0, -1.0), 0.5, Material::as_dielectric(1.5));
-    let sphere4 = Sphere::new(Vec3::new(-1.0, 0.0, -1.0), -0.45, Material::as_dielectric(1.5));
-    world.list.push(Box::new(sphere0));
-    world.list.push(Box::new(sphere1));
-    world.list.push(Box::new(sphere2));
-    world.list.push(Box::new(sphere3));
-    world.list.push(Box::new(sphere4));
 
+    // Ground plane
+    let sphere = Sphere::new(Vec3::new(0.0, -1000.0, 0.0), 1000.0, Material::as_lambertian(Vec3::new(0.5, 0.5, 0.5)));
+    world.list.push(Box::new(sphere));
+
+    // Central spheres
+    let sphere = Sphere::new(Vec3::new(0.0, 1.0, 0.0), 1.0, Material::as_dielectric(1.5));
+    world.list.push(Box::new(sphere));
+    let sphere = Sphere::new(Vec3::new(-4.0, 1.0, 0.0), 1.0, Material::as_lambertian(Vec3::new(0.4, 0.2, 0.1)));
+    world.list.push(Box::new(sphere));
+    let sphere = Sphere::new(Vec3::new(4.0, 1.0, 0.0), 1.0, Material::as_metal(Vec3::new(0.7, 0.6, 0.5)));
+    world.list.push(Box::new(sphere));
+
+    // Random spheres
+    for a in -11..11 {
+        for b in -11..11 {
+            let choose_mat = random::<f32>();
+            let center = Vec3::new((a as f32) + 0.9 * random::<f32>(), 0.2, (b as f32) + 0.9 * random::<f32>());
+
+            if (center - Vec3::new(4.0, 0.2, 0.0)).length() > 0.9 {
+                if choose_mat < 0.8 {
+                    let sphere = Sphere::new(center, 0.2, Material::as_lambertian(Vec3::new(random::<f32>()*random::<f32>(), random::<f32>()*random::<f32>(), random::<f32>()*random::<f32>())));
+                    world.list.push(Box::new(sphere));
+                }
+                else if choose_mat < 0.95 {
+                    let sphere = Sphere::new(center, 0.2, Material::as_metal(Vec3::new(0.5 * (1.0 + random::<f32>()), 0.5 * (1.0 + random::<f32>()), 0.5 * random::<f32>())));
+                    world.list.push(Box::new(sphere));
+                }
+                else {
+                    let sphere = Sphere::new(center, 0.2, Material::as_dielectric(1.5));
+                    world.list.push(Box::new(sphere));
+                }
+            }
+        }
+    }
+
+    // Camera setup
     let fovy :f32 = 20.0;
     let aspect = (nx as f32) / (ny as f32);
-    let pos = Vec3::new(3.0, 3.0, 2.0);
-    let target = Vec3::new(0.0, 0.0, -1.0);
+    let pos = Vec3::new(13.0, 2.0, 3.0);
+    let target = Vec3::new(0.0, 0.0, 0.0);
     let up = Vec3::unit_y();
-    let dist_to_focus = (pos - target).length();
-    let aperture = 2.0;
+    let dist_to_focus = 5.0;
+    let aperture = 0.1;
     let cam = Camera::look_at(pos, target, up, fovy, aspect, aperture, dist_to_focus);
 
     let file = File::create("image.ppm").expect("Unable to create file");
