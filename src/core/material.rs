@@ -20,9 +20,9 @@ impl Lambertian {
 }
 
 impl Scatterable for Lambertian {
-    fn scatter(&self, _r_in: &Ray, rec: &HitRecord, attenuation: &mut Vec3, scattered: &mut Ray) -> bool {
+    fn scatter(&self, r_in: &Ray, rec: &HitRecord, attenuation: &mut Vec3, scattered: &mut Ray) -> bool {
         let target = rec.p + rec.normal + random_in_unit_sphere();
-        *scattered = Ray::new(rec.p, target - rec.p);
+        *scattered = Ray::new(rec.p, target - rec.p, r_in.time());
         *attenuation = self.albedo;
         true
     }
@@ -68,7 +68,7 @@ impl Scatterable for Metal {
         let mut unit_vector = r_in.direction();
         unit_vector.normalize();
         let reflected = reflect(unit_vector, rec.normal);
-        *scattered = Ray::new(rec.p, reflected);
+        *scattered = Ray::new(rec.p, reflected, r_in.time());
         *attenuation = self.albedo;
         
         dot(scattered.direction(), rec.normal) > 0.0
@@ -110,15 +110,15 @@ impl Scatterable for Dielectric {
             reflect_prob = schlick(cosine, self.ref_idx);
         }
         else {
-            *scattered = Ray::new(rec.p, reflected);
+            *scattered = Ray::new(rec.p, reflected, r_in.time());
             reflect_prob = 1.0;
         }
 
         if random::<f32>() < reflect_prob {
-            *scattered = Ray::new(rec.p, reflected);
+            *scattered = Ray::new(rec.p, reflected, r_in.time());
         }
         else {
-            *scattered = Ray::new(rec.p, refracted);
+            *scattered = Ray::new(rec.p, refracted, r_in.time());
         }
 
         return true;

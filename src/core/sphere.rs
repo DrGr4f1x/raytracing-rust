@@ -49,3 +49,62 @@ impl Hitable for Sphere {
         return false
     }
 }
+
+#[derive(Clone, Copy, Debug)]
+pub struct MovableSphere {
+    pub center0: Vec3,
+    pub center1: Vec3,
+    pub radius: f32,
+    pub time0: f32,
+    pub time1: f32,
+    pub material: Material,
+}
+
+impl MovableSphere {
+    pub fn new(cen0: Vec3, cen1: Vec3, r: f32, t0: f32, t1: f32, mat: Material) -> Self {
+        MovableSphere { 
+            center0: cen0,
+            center1: cen1,
+            radius: r, 
+            time0: t0,
+            time1: t1,
+            material: mat }
+    }
+
+    pub fn center(&self, t: f32) -> Vec3 {
+        self.center0 + ((t - self.time0) / (self.time1 - self.time0)) * (self.center1 - self.center0)
+    }
+}
+
+impl Hitable for MovableSphere {
+    fn hit(&self, r: Ray, t_min: f32, t_max: f32, rec: &mut HitRecord) -> bool {
+        let oc = r.origin() - self.center(r.time());
+        let a = dot(r.direction(), r.direction());
+        let b = dot(oc, r.direction());
+        let c = dot(oc, oc) - self.radius * self.radius;
+        let discriminant = b * b - a * c;
+
+        if discriminant > 0.0 {
+            let temp = (-b - f32::sqrt(b * b - a * c)) / a;
+            if (temp < t_max) && (temp > t_min) {
+                rec.t = temp;
+                rec.p = r.point_at_parameter(rec.t);
+                rec.normal = (rec.p - self.center(r.time())) / self.radius;
+                rec.material = self.material;
+
+                return true
+            }
+            let temp = (-b + f32::sqrt(b * b - a * c)) / a;
+            if (temp < t_max) && (temp > t_min) {
+                rec.t = temp;
+                rec.p = r.point_at_parameter(rec.t);
+                rec.normal = (rec.p - self.center(r.time())) / self.radius;
+                rec.material = self.material;
+
+                return true
+            }
+        }
+
+        return false
+    }
+}
