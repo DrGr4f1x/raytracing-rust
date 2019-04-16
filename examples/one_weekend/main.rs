@@ -1,18 +1,15 @@
-use std::fs::{File};
-use std::io::{BufWriter, Write};
 use std::f32;
 use rand::random;
 
-pub mod core;
-use crate::core::vec3::*;
-use crate::core::ray::*;
-use crate::core::hitable::*;
-use crate::core::sphere::*;
-use crate::core::hitable_list::*;
-use crate::core::camera::*;
-use crate::core::material::*;
-use crate::core::image::*;
-
+extern crate raytracer;
+use raytracer::core::vec3::*;
+use raytracer::core::ray::*;
+use raytracer::core::hitable::*;
+use raytracer::core::hitable_list::*;
+use raytracer::core::material::*;
+use raytracer::core::sphere::*;
+use raytracer::core::camera::*;
+use raytracer::core::image::*;
 
 fn color(r: Ray, world: &Hitable, depth: i32) -> Vec3 {
     let mut rec = HitRecord::new();

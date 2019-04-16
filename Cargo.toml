@@ -6,3 +6,7 @@ edition = "2018"
 
 [dependencies]
 rand = "0.6"
+
+[lib]
+name = "raytracer"
+path = "src/lib.rs"
