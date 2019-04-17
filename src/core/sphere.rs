@@ -18,7 +18,7 @@ impl Sphere {
 }
 
 impl Hitable for Sphere {
-    fn hit(&self, r: Ray, t_min: f32, t_max: f32, rec: &mut HitRecord) -> bool {
+    fn hit(&self, r: Ray, t_min: f32, t_max: f32) -> Option<HitRecord> {
         let oc = r.origin() - self.center;
         let a = dot(r.direction(), r.direction());
         let b = dot(oc, r.direction());
@@ -28,25 +28,31 @@ impl Hitable for Sphere {
         if discriminant > 0.0 {
             let temp = (-b - f32::sqrt(b * b - a * c)) / a;
             if (temp < t_max) && (temp > t_min) {
-                rec.t = temp;
-                rec.p = r.point_at_parameter(rec.t);
-                rec.normal = (rec.p - self.center) / self.radius;
-                rec.material = self.material;
 
-                return true
+                let p = r.point_at_parameter(temp);
+                let rec = HitRecord {
+                    t: temp,
+                    p,
+                    normal: (p - self.center) / self.radius,
+                    material: self.material };
+
+                return Some(rec)
             }
             let temp = (-b + f32::sqrt(b * b - a * c)) / a;
             if (temp < t_max) && (temp > t_min) {
-                rec.t = temp;
-                rec.p = r.point_at_parameter(rec.t);
-                rec.normal = (rec.p - self.center) / self.radius;
-                rec.material = self.material;
+                
+                let p = r.point_at_parameter(temp);
+                let rec = HitRecord {
+                    t: temp,
+                    p,
+                    normal: (p - self.center) / self.radius,
+                    material: self.material };
 
-                return true
+                return Some(rec)
             }
         }
 
-        return false
+        None
     }
 }
 
@@ -77,7 +83,7 @@ impl MovableSphere {
 }
 
 impl Hitable for MovableSphere {
-    fn hit(&self, r: Ray, t_min: f32, t_max: f32, rec: &mut HitRecord) -> bool {
+    fn hit(&self, r: Ray, t_min: f32, t_max: f32) -> Option<HitRecord> {
         let oc = r.origin() - self.center(r.time());
         let a = dot(r.direction(), r.direction());
         let b = dot(oc, r.direction());
@@ -87,24 +93,30 @@ impl Hitable for MovableSphere {
         if discriminant > 0.0 {
             let temp = (-b - f32::sqrt(b * b - a * c)) / a;
             if (temp < t_max) && (temp > t_min) {
-                rec.t = temp;
-                rec.p = r.point_at_parameter(rec.t);
-                rec.normal = (rec.p - self.center(r.time())) / self.radius;
-                rec.material = self.material;
 
-                return true
+                let p = r.point_at_parameter(temp);
+                let rec = HitRecord {
+                    t: temp,
+                    p,
+                    normal: (p - self.center(r.time())) / self.radius,
+                    material: self.material };
+
+                return Some(rec)
             }
             let temp = (-b + f32::sqrt(b * b - a * c)) / a;
             if (temp < t_max) && (temp > t_min) {
-                rec.t = temp;
-                rec.p = r.point_at_parameter(rec.t);
-                rec.normal = (rec.p - self.center(r.time())) / self.radius;
-                rec.material = self.material;
 
-                return true
+                let p = r.point_at_parameter(temp);
+                let rec = HitRecord {
+                    t: temp,
+                    p,
+                    normal: (p - self.center(r.time())) / self.radius,
+                    material: self.material };
+
+                return Some(rec)
             }
         }
 
-        false
+        None
     }
 }

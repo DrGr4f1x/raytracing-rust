@@ -13,26 +13,27 @@ use raytracer::core::camera::*;
 use raytracer::core::image::*;
 
 fn color(r: Ray, world: &Hitable, depth: i32, mut total_rays: &mut u32) -> Vec3 {
-    let mut rec = HitRecord::new();
-
     *total_rays += 1;
 
-    if world.hit(r, 0.001, f32::MAX, &mut rec) {
-        if depth < 50 {
-            match rec.material.scatter(&r, &rec) {
-                Some((attenuation, scattered)) => attenuation * color(scattered, world, depth + 1, &mut total_rays),
-                None => Vec3::zero()
+    let maybe_hit = world.hit(r, 0.001, f32::MAX);
+
+    match maybe_hit {
+        Some(hit) => {
+            if depth < 50 {
+                match hit.material.scatter(&r, &hit) {
+                    Some((attenuation, scattered)) => attenuation * color(scattered, world, depth + 1, &mut total_rays),
+                    None => Vec3::zero()
+                }
             }
+            else {
+                Vec3::zero()
+            }
+        },
+        None => {
+            let unit_direction: Vec3 = unit_vector(r.direction());
+            let t: f32 = 0.5 * (unit_direction.y() + 1.0);
+            (1.0 - t) * Vec3::one() + t * Vec3::new(0.5, 0.7, 1.0)
         }
-        else {
-            Vec3::zero()
-        }
-    }
-    else
-    {
-        let unit_direction: Vec3 = unit_vector(r.direction());
-        let t: f32 = 0.5 * (unit_direction.y() + 1.0);
-        (1.0 - t) * Vec3::one() + t * Vec3::new(0.5, 0.7, 1.0)
     }
 }
 

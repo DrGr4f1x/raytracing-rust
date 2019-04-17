@@ -18,19 +18,21 @@ impl Default for HitableList {
 }
 
 impl Hitable for HitableList {
-    fn hit(&self, r: Ray, t_min: f32, t_max: f32, rec: &mut HitRecord) -> bool {
-        let mut temp_rec = HitRecord::new();
-        let mut hit_anything = false;
+    fn hit(&self, r: Ray, t_min: f32, t_max: f32) -> Option<HitRecord> {
         let mut closest_so_far = t_max;
+        let mut best_hit: Option<HitRecord> = None;
 
         for i in 0..self.list.len() {
-            if self.list[i].hit(r, t_min, closest_so_far, &mut temp_rec) {
-                hit_anything = true;
-                closest_so_far = temp_rec.t;
-                *rec = temp_rec;
+            let maybe_hit = self.list[i].hit(r, t_min, closest_so_far);
+            match maybe_hit {
+                Some(hit) => {
+                    closest_so_far = hit.t;
+                    best_hit = maybe_hit;
+                },
+                None => (),
             }
         }
 
-        hit_anything
+        best_hit
     }
 }
