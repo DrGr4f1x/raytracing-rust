@@ -15,10 +15,11 @@ fn color(r: Ray, world: &Hitable, depth: i32) -> Vec3 {
     let mut rec = HitRecord::new();
 
     if world.hit(r, 0.001, f32::MAX, &mut rec) {
-        let mut scattered = Ray::new(Vec3::zero(), Vec3::unit_z(), 0.0);
-        let mut attenuation = Vec3::zero();
-        if (depth < 50) && rec.material.scatter(&r, &rec, &mut attenuation, &mut scattered) {
-            attenuation * color(scattered, world, depth + 1)
+        if depth < 50 {
+            match rec.material.scatter(&r, &rec) {
+                Some((attenuation, scattered)) => attenuation * color(scattered, world, depth + 1),
+                None => Vec3::zero()
+            }
         }
         else {
             Vec3::zero()

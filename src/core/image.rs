@@ -1,6 +1,5 @@
 use std::fs::{File};
 use std::io::{BufWriter, Write};
-use std::io::prelude::*;
 use super::vec3::*;
 
 pub struct Image {
