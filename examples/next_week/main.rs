@@ -1,4 +1,5 @@
 use std::f32;
+use std::time::Instant;
 use rand::random;
 
 extern crate raytracer;
@@ -11,13 +12,15 @@ use raytracer::core::sphere::*;
 use raytracer::core::camera::*;
 use raytracer::core::image::*;
 
-fn color(r: Ray, world: &Hitable, depth: i32) -> Vec3 {
+fn color(r: Ray, world: &Hitable, depth: i32, mut total_rays: &mut u32) -> Vec3 {
     let mut rec = HitRecord::new();
+
+    *total_rays += 1;
 
     if world.hit(r, 0.001, f32::MAX, &mut rec) {
         if depth < 50 {
             match rec.material.scatter(&r, &rec) {
-                Some((attenuation, scattered)) => attenuation * color(scattered, world, depth + 1),
+                Some((attenuation, scattered)) => attenuation * color(scattered, world, depth + 1, &mut total_rays),
                 None => Vec3::zero()
             }
         }
@@ -94,6 +97,9 @@ fn main() {
     // Output image
     let mut image = Image::new(nx, ny);
 
+    let mut total_rays = 0;
+    let now = Instant::now();
+
     for j in (0..ny).rev() {
         for i in 0..nx {
             let mut col = Vec3::zero();
@@ -103,7 +109,7 @@ fn main() {
                 let v = ((j as f32) + random::<f32>()) / (ny as f32);
                 let r = cam.get_ray(u, v);
                 
-                col += color(r, &world, 0);
+                col += color(r, &world, 0, &mut total_rays);
             }
 
             col /= ns as f32;
@@ -112,6 +118,16 @@ fn main() {
             image.set_pixel(i, j, col);
         }
     }
+
+    let secs = now.elapsed().as_secs();
+    let primary_rays = nx * ny * ns;
+    let primary_rays_per_second: f64 = (primary_rays as f64) / (secs as f64);
+    let total_rays_per_second: f64 = (total_rays as f64) / (secs as f64);
+
+    println!("Ray cast time: {}", secs);
+    println!("  Image size: {} x {} ({} samples per pixel)", nx, ny, ns);
+    println!("  Primary rays per second: {}, primary rays: {}", primary_rays_per_second, primary_rays);
+    println!("  Total rays per second: {}, total rays: {}", total_rays_per_second, total_rays);
 
     image.save_as("image.ppm");
 }
