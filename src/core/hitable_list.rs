@@ -11,6 +11,12 @@ impl HitableList {
     }
 }
 
+impl Default for HitableList {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Hitable for HitableList {
     fn hit(&self, r: Ray, t_min: f32, t_max: f32, rec: &mut HitRecord) -> bool {
         let mut temp_rec = HitRecord::new();

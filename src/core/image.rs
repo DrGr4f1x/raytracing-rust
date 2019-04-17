@@ -1,5 +1,6 @@
 use std::fs::{File};
 use std::io::{BufWriter, Write};
+use std::io::prelude::*;
 use super::vec3::*;
 
 pub struct Image {
@@ -44,7 +45,7 @@ impl Image {
     pub fn save_as(&self, filename: &str) {
         let file = File::create(filename.to_string()).expect("Unable to create file");
         let mut buf_writer = BufWriter::new(file);
-        buf_writer.write_fmt(format_args!("P3\n{} {}\n255\n", self.width, self.height));
+        write!(buf_writer, "P3\n{} {}\n255\n", self.width, self.height);
 
         for j in (0..self.height).rev() {
             for i in 0..self.width {
@@ -54,7 +55,7 @@ impl Image {
                 let ig : i32 = (255.99 * col.g()) as i32;
                 let ib : i32 = (255.99 * col.b()) as i32;
 
-                buf_writer.write_fmt(format_args!("{} {} {}\n", ir, ig, ib));
+                writeln!(buf_writer, "{} {} {}", ir, ig, ib);
             }
         }
     }

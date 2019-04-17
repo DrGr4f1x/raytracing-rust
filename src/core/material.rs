@@ -14,8 +14,8 @@ pub struct Lambertian {
 }
 
 impl Lambertian {
-    pub fn new(a: Vec3) -> Self {
-        Lambertian { albedo: a }
+    pub fn new(albedo: Vec3) -> Self {
+        Lambertian { albedo }
     }
 }
 
@@ -39,10 +39,10 @@ fn refract(v: Vec3, n: Vec3, ni_over_nt: f32, refracted: &mut Vec3) -> bool {
     let discriminant = 1.0 - ni_over_nt * ni_over_nt * (1.0 - dt * dt);
     if discriminant > 0.0 {
         *refracted = ni_over_nt * (uv - n * dt) - n * f32::sqrt(discriminant);
-        return true
+        true
     }
     else {
-        return false
+        false
     }
 }
 
@@ -58,8 +58,8 @@ pub struct Metal {
 }
 
 impl Metal {
-    pub fn new(a: Vec3) -> Self {
-        Metal { albedo: a }
+    pub fn new(albedo: Vec3) -> Self {
+        Metal { albedo }
     }
 }
 
@@ -81,29 +81,26 @@ pub struct Dielectric {
 }
 
 impl Dielectric {
-    pub fn new(a: f32) -> Self {
-        Dielectric{ ref_idx: a }
+    pub fn new(ref_idx: f32) -> Self {
+        Dielectric{ ref_idx }
     }
 }
 
 impl Scatterable for Dielectric {
     fn scatter(&self, r_in: &Ray, rec: &HitRecord, attenuation: &mut Vec3, scattered: &mut Ray) -> bool {
-        let outward_normal: Vec3;
         let reflected = reflect(r_in.direction(), rec.normal);
-        let ni_over_nt: f32;
         *attenuation = Vec3::one();
         let reflect_prob: f32;
-        let cosine: f32;
-        if dot(r_in.direction(), rec.normal) > 0.0 {
-            outward_normal = -1.0 * rec.normal;
-            ni_over_nt = self.ref_idx;
-            cosine = self.ref_idx * dot(r_in.direction(), rec.normal) / r_in.direction().length();
-        }
-        else {
-            outward_normal = rec.normal;
-            ni_over_nt = 1.0 / self.ref_idx;
-            cosine = -dot(r_in.direction(), rec.normal) / r_in.direction().length();
-        }
+        let dir_dot_normal = dot(r_in.direction(), rec.normal);
+        let cosine = if dir_dot_normal > 0.0 { 
+                self.ref_idx * dir_dot_normal / r_in.direction().length()
+            } 
+            else { 
+                -dir_dot_normal / r_in.direction().length()
+            };
+
+        let outward_normal = if dir_dot_normal > 0.0 { -1.0 * rec.normal } else { rec.normal };
+        let ni_over_nt = if dir_dot_normal > 0.0 { self.ref_idx } else { 1.0 / self.ref_idx };
 
         let mut refracted = Vec3::zero();
         if refract(r_in.direction(), outward_normal, ni_over_nt, &mut refracted) {
@@ -121,7 +118,7 @@ impl Scatterable for Dielectric {
             *scattered = Ray::new(rec.p, refracted, r_in.time());
         }
 
-        return true;
+        true
     }
 }
 
@@ -133,16 +130,16 @@ pub enum Material {
 }
 
 impl Material {
-    pub fn as_lambertian(a: Vec3) -> Self {
-        Material::Lambertian(Lambertian::new(a))
+    pub fn lambertian(albedo: Vec3) -> Self {
+        Material::Lambertian(Lambertian::new(albedo))
     }
 
-    pub fn as_metal(a: Vec3) -> Self {
-        Material::Metal(Metal::new(a))
+    pub fn metal(albedo: Vec3) -> Self {
+        Material::Metal(Metal::new(albedo))
     }
 
-    pub fn as_dielectric(a: f32) -> Self {
-        Material::Dielectric(Dielectric::new(a))
+    pub fn dielectric(ref_idx: f32) -> Self {
+        Material::Dielectric(Dielectric::new(ref_idx))
     }
 }
 

@@ -18,16 +18,15 @@ fn color(r: Ray, world: &Hitable, depth: i32) -> Vec3 {
         let mut scattered = Ray::new(Vec3::zero(), Vec3::unit_z(), 0.0);
         let mut attenuation = Vec3::zero();
         if (depth < 50) && rec.material.scatter(&r, &rec, &mut attenuation, &mut scattered) {
-            return attenuation * color(scattered, world, depth + 1)
+            attenuation * color(scattered, world, depth + 1)
         }
         else {
-            return Vec3::zero()
+            Vec3::zero()
         }
     }
     else
     {
-        let mut unit_direction: Vec3 = r.direction();
-        unit_direction.normalize();
+        let unit_direction: Vec3 = unit_vector(r.direction());
         let t: f32 = 0.5 * (unit_direction.y() + 1.0);
         (1.0 - t) * Vec3::one() + t * Vec3::new(0.5, 0.7, 1.0)
     }
@@ -36,20 +35,20 @@ fn color(r: Ray, world: &Hitable, depth: i32) -> Vec3 {
 fn main() {
     let nx = 1280;
     let ny = 720;
-    let ns = 1024;
+    let ns = 16;
 
     let mut world = HitableList::new();
 
     // Ground plane
-    let sphere = Sphere::new(Vec3::new(0.0, -1000.0, 0.0), 1000.0, Material::as_lambertian(Vec3::new(0.5, 0.5, 0.5)));
+    let sphere = Sphere::new(Vec3::new(0.0, -1000.0, 0.0), 1000.0, Material::lambertian(Vec3::new(0.5, 0.5, 0.5)));
     world.list.push(Box::new(sphere));
 
     // Central spheres
-    let sphere = Sphere::new(Vec3::new(0.0, 1.0, 0.0), 1.0, Material::as_dielectric(1.5));
+    let sphere = Sphere::new(Vec3::new(0.0, 1.0, 0.0), 1.0, Material::dielectric(1.5));
     world.list.push(Box::new(sphere));
-    let sphere = Sphere::new(Vec3::new(-4.0, 1.0, 0.0), 1.0, Material::as_lambertian(Vec3::new(0.4, 0.2, 0.1)));
+    let sphere = Sphere::new(Vec3::new(-4.0, 1.0, 0.0), 1.0, Material::lambertian(Vec3::new(0.4, 0.2, 0.1)));
     world.list.push(Box::new(sphere));
-    let sphere = Sphere::new(Vec3::new(4.0, 1.0, 0.0), 1.0, Material::as_metal(Vec3::new(0.7, 0.6, 0.5)));
+    let sphere = Sphere::new(Vec3::new(4.0, 1.0, 0.0), 1.0, Material::metal(Vec3::new(0.7, 0.6, 0.5)));
     world.list.push(Box::new(sphere));
 
     // Random spheres
@@ -66,15 +65,15 @@ fn main() {
                         0.2, // radius
                         0.0, // time0
                         1.0, // time1
-                         Material::as_lambertian(Vec3::new(random::<f32>()*random::<f32>(), random::<f32>()*random::<f32>(), random::<f32>()*random::<f32>())));
+                         Material::lambertian(Vec3::new(random::<f32>()*random::<f32>(), random::<f32>()*random::<f32>(), random::<f32>()*random::<f32>())));
                     world.list.push(Box::new(sphere));
                 }
                 else if choose_mat < 0.95 {
-                    let sphere = Sphere::new(center, 0.2, Material::as_metal(Vec3::new(0.5 * (1.0 + random::<f32>()), 0.5 * (1.0 + random::<f32>()), 0.5 * random::<f32>())));
+                    let sphere = Sphere::new(center, 0.2, Material::metal(Vec3::new(0.5 * (1.0 + random::<f32>()), 0.5 * (1.0 + random::<f32>()), 0.5 * random::<f32>())));
                     world.list.push(Box::new(sphere));
                 }
                 else {
-                    let sphere = Sphere::new(center, 0.2, Material::as_dielectric(1.5));
+                    let sphere = Sphere::new(center, 0.2, Material::dielectric(1.5));
                     world.list.push(Box::new(sphere));
                 }
             }

@@ -105,6 +105,6 @@ impl Hitable for MovableSphere {
             }
         }
 
-        return false
+        false
     }
 }

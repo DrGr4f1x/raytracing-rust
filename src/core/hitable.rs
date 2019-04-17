@@ -20,6 +20,12 @@ impl HitRecord {
     }
 }
 
+impl Default for HitRecord {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub trait Hitable {
     fn hit(&self, r: Ray, t_min: f32, t_max: f32, rec: &mut HitRecord) -> bool;
 }
