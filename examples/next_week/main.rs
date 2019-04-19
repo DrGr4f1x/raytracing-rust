@@ -11,7 +11,7 @@ use raytracer::core::material::*;
 use raytracer::core::sphere::*;
 use raytracer::core::camera::*;
 use raytracer::core::image::*;
-//use raytracer::core::bvh::*;
+use raytracer::core::bvh::*;
 
 fn color(r: Ray, world: &Hitable, depth: i32, mut total_rays: &mut u32) -> Vec3 {
     *total_rays += 1;
@@ -86,9 +86,9 @@ fn main() {
         }
     }
 
-    //println!("Begin build BVH");
-    //let world_bvh = BVHNode::new(&mut world.list, 0.0, 1.0);
-    //println!("End build BVH");
+    println!("Begin build BVH");
+    let world_bvh = BVHNode::new(&mut world.list, 0.0, 1.0);
+    println!("End build BVH");
 
     // Camera setup
     let fovy: f32 = 20.0;
@@ -115,7 +115,7 @@ fn main() {
                 let v = ((j as f32) + random::<f32>()) / (ny as f32);
                 let r = cam.get_ray(u, v);
                 
-                col += color(r, &world, 0, &mut total_rays);
+                col += color(r, &world_bvh, 0, &mut total_rays);
             }
 
             col /= ns as f32;

@@ -79,12 +79,6 @@ fn main() {
         }
     }
 
-    // Sort test
-    let mut test_vec = vec![1, 6, 4, 3, 5, 2];
-    println!("test_vec: {:?}", test_vec);
-    test_vec[1..4].sort();
-    println!("test_vec: {:?}", test_vec);
-
     // Camera setup
     let fovy: f32 = 20.0;
     let aspect = (nx as f32) / (ny as f32);
@@ -130,5 +124,5 @@ fn main() {
     println!("  Primary rays per second: {}, primary rays: {}", primary_rays_per_second, primary_rays);
     println!("  Total rays per second: {}, total rays: {}", total_rays_per_second, total_rays);
 
-    image.save_as("image.ppm");
+    image.save_as("image.ppm").expect("Couldn't write image file");
 }

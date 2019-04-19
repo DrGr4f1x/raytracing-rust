@@ -11,3 +11,6 @@ clippy = {version = "*", optional = true}
 [lib]
 name = "raytracer"
 path = "src/lib.rs"
+
+[profile.release]
+debug = true
