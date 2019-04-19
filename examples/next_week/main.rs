@@ -1,6 +1,7 @@
 use std::f32;
 use std::time::Instant;
 use rand::random;
+use indicatif::{ProgressBar, ProgressStyle};
 
 extern crate raytracer;
 use raytracer::core::vec3::*;
@@ -103,6 +104,11 @@ fn main() {
     // Output image
     let mut image = Image::new(nx, ny);
 
+    let bar = ProgressBar::new(ny as u64);
+    bar.set_style(ProgressStyle::default_bar()
+        .template("[{elapsed_precise}] {bar:60.white/yellow} {pos:>7}/{len:7} {msg}")
+        .progress_chars("##-"));
+
     let mut total_rays = 0;
     let now = Instant::now();
 
@@ -123,7 +129,9 @@ fn main() {
 
             image.set_pixel(i, j, col);
         }
+        bar.inc(1);
     }
+    bar.finish();
 
     let secs: f64 = (now.elapsed().as_millis() as f64) / 1000.0;
     let primary_rays = nx * ny * ns;

@@ -210,7 +210,8 @@ impl Div<f32> for Vec3 {
     type Output = Vec3;
 
     fn div(self, rhs: f32) -> Self {
-        Vec3 { e: [self.x() / rhs, self.y() / rhs, self.z() / rhs] }
+        let k: f32 = 1.0 / rhs;
+        Vec3 { e: [self.x() * k, self.y() * k, self.z() * k] }
     }
 }
 
@@ -232,9 +233,10 @@ impl DivAssign for Vec3 {
 
 impl DivAssign<f32> for Vec3 {
     fn div_assign(&mut self, rhs: f32) {
-        self.e[0] /= rhs;
-        self.e[1] /= rhs;
-        self.e[2] /= rhs;
+        let k: f32 = 1.0 / rhs;
+        self.e[0] *= k;
+        self.e[1] *= k;
+        self.e[2] *= k;
     }
 }
 
@@ -247,7 +249,7 @@ impl Index<usize> for Vec3 {
 }
 
 impl IndexMut<usize> for Vec3 {
-    fn index_mut<'a>(&'a mut self, index: usize) -> &'a mut f32 {
+    fn index_mut(&mut self, index: usize) -> &mut f32 {
         &mut self.e[index]
     }
 }
