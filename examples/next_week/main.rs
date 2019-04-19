@@ -11,6 +11,7 @@ use raytracer::core::material::*;
 use raytracer::core::sphere::*;
 use raytracer::core::camera::*;
 use raytracer::core::image::*;
+//use raytracer::core::bvh::*;
 
 fn color(r: Ray, world: &Hitable, depth: i32, mut total_rays: &mut u32) -> Vec3 {
     *total_rays += 1;
@@ -85,6 +86,10 @@ fn main() {
         }
     }
 
+    //println!("Begin build BVH");
+    //let world_bvh = BVHNode::new(&mut world.list, 0.0, 1.0);
+    //println!("End build BVH");
+
     // Camera setup
     let fovy: f32 = 20.0;
     let aspect = (nx as f32) / (ny as f32);
@@ -120,7 +125,7 @@ fn main() {
         }
     }
 
-    let secs = now.elapsed().as_secs();
+    let secs: f64 = (now.elapsed().as_millis() as f64) / 1000.0;
     let primary_rays = nx * ny * ns;
     let primary_rays_per_second: f64 = (primary_rays as f64) / (secs as f64);
     let total_rays_per_second: f64 = (total_rays as f64) / (secs as f64);
@@ -130,5 +135,5 @@ fn main() {
     println!("  Primary rays per second: {}, primary rays: {}", primary_rays_per_second, primary_rays);
     println!("  Total rays per second: {}, total rays: {}", total_rays_per_second, total_rays);
 
-    image.save_as("image.ppm");
+    image.save_as("image.ppm").expect("Couldn't write image file");
 }

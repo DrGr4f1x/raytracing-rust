@@ -79,6 +79,12 @@ fn main() {
         }
     }
 
+    // Sort test
+    let mut test_vec = vec![1, 6, 4, 3, 5, 2];
+    println!("test_vec: {:?}", test_vec);
+    test_vec[1..4].sort();
+    println!("test_vec: {:?}", test_vec);
+
     // Camera setup
     let fovy: f32 = 20.0;
     let aspect = (nx as f32) / (ny as f32);
@@ -114,7 +120,7 @@ fn main() {
         }
     }
 
-    let secs = now.elapsed().as_secs();
+    let secs: f64 = (now.elapsed().as_millis() as f64) / 1000.0;
     let primary_rays = nx * ny * ns;
     let primary_rays_per_second: f64 = (primary_rays as f64) / (secs as f64);
     let total_rays_per_second: f64 = (total_rays as f64) / (secs as f64);

@@ -7,3 +7,5 @@ pub mod camera;
 pub mod sampling;
 pub mod material;
 pub mod image;
+pub mod aabb;
+pub mod bvh;

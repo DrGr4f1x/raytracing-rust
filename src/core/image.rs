@@ -41,10 +41,10 @@ impl Image {
         self.image_data[i + j * self.width] = color;
     }
 
-    pub fn save_as(&self, filename: &str) {
+    pub fn save_as(&self, filename: &str) -> std::io::Result<()> {
         let file = File::create(filename.to_string()).expect("Unable to create file");
         let mut buf_writer = BufWriter::new(file);
-        write!(buf_writer, "P3\n{} {}\n255\n", self.width, self.height);
+        write!(buf_writer, "P3\n{} {}\n255\n", self.width, self.height)?;
 
         for j in (0..self.height).rev() {
             for i in 0..self.width {
@@ -54,8 +54,10 @@ impl Image {
                 let ig : i32 = (255.99 * col.g()) as i32;
                 let ib : i32 = (255.99 * col.b()) as i32;
 
-                writeln!(buf_writer, "{} {} {}", ir, ig, ib);
+                writeln!(buf_writer, "{} {} {}", ir, ig, ib)?;
             }
         }
+
+        Ok(())
     }
 }

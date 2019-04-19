@@ -1,5 +1,6 @@
 use std::ops::{Add, Sub, Mul, Div};
 use std::ops::{AddAssign, SubAssign, MulAssign, DivAssign};
+use std::ops::{Index, IndexMut};
 use std::f32;
 
 #[derive(Clone, Copy, Debug)]
@@ -234,6 +235,20 @@ impl DivAssign<f32> for Vec3 {
         self.e[0] /= rhs;
         self.e[1] /= rhs;
         self.e[2] /= rhs;
+    }
+}
+
+impl Index<usize> for Vec3 {
+    type Output = f32;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        &self.e[index]
+    }
+}
+
+impl IndexMut<usize> for Vec3 {
+    fn index_mut<'a>(&'a mut self, index: usize) -> &'a mut f32 {
+        &mut self.e[index]
     }
 }
 

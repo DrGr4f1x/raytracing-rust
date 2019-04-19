@@ -1,6 +1,7 @@
 use super::vec3::*;
 use super::ray::*;
 use super::material::*;
+use super::aabb::*;
 
 #[derive(Clone, Copy, Debug)]
 pub struct HitRecord {
@@ -28,4 +29,12 @@ impl Default for HitRecord {
 
 pub trait Hitable {
     fn hit(&self, r: Ray, t_min: f32, t_max: f32) -> Option<HitRecord>;
+    fn bounding_box(&self, t0: f32, t1: f32) -> Option<AABB>;
+    fn clone_to_box(&self) -> Box<dyn Hitable>;
+}
+
+impl Clone for Box<dyn Hitable> {
+    fn clone(&self) -> Box<dyn Hitable> {
+        self.clone_to_box()
+    }
 }

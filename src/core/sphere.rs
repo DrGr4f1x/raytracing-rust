@@ -2,6 +2,7 @@ use super::vec3::*;
 use super::ray::*;
 use super::hitable::*;
 use super::material::*;
+use super::aabb::*;
 use std::f32;
 
 #[derive(Clone, Copy, Debug)]
@@ -29,23 +30,23 @@ impl Hitable for Sphere {
             let temp = (-b - f32::sqrt(b * b - a * c)) / a;
             if (temp < t_max) && (temp > t_min) {
 
-                let p = r.point_at_parameter(temp);
+                let pos = r.point_at_parameter(temp);
                 let rec = HitRecord {
                     t: temp,
-                    p,
-                    normal: (p - self.center) / self.radius,
+                    p: pos,
+                    normal: (pos - self.center) / self.radius,
                     material: self.material };
 
                 return Some(rec)
             }
             let temp = (-b + f32::sqrt(b * b - a * c)) / a;
             if (temp < t_max) && (temp > t_min) {
-                
-                let p = r.point_at_parameter(temp);
+
+                let pos = r.point_at_parameter(temp);
                 let rec = HitRecord {
                     t: temp,
-                    p,
-                    normal: (p - self.center) / self.radius,
+                    p: pos,
+                    normal: (pos - self.center) / self.radius,
                     material: self.material };
 
                 return Some(rec)
@@ -53,6 +54,19 @@ impl Hitable for Sphere {
         }
 
         None
+    }
+
+    fn bounding_box(&self, _t0: f32, _t1: f32) -> Option<AABB> {
+        let aabb = AABB::new(
+            self.center - Vec3::new(self.radius, self.radius, self.radius),
+            self.center + Vec3::new(self.radius, self.radius, self.radius),
+        );
+
+        Some(aabb)
+    }
+
+    fn clone_to_box(&self) -> Box<dyn Hitable> {
+        Box::new(*self)
     }
 }
 
@@ -94,11 +108,11 @@ impl Hitable for MovableSphere {
             let temp = (-b - f32::sqrt(b * b - a * c)) / a;
             if (temp < t_max) && (temp > t_min) {
 
-                let p = r.point_at_parameter(temp);
+                let pos = r.point_at_parameter(temp);
                 let rec = HitRecord {
                     t: temp,
-                    p,
-                    normal: (p - self.center(r.time())) / self.radius,
+                    p: pos,
+                    normal: (pos - self.center(r.time())) / self.radius,
                     material: self.material };
 
                 return Some(rec)
@@ -106,11 +120,11 @@ impl Hitable for MovableSphere {
             let temp = (-b + f32::sqrt(b * b - a * c)) / a;
             if (temp < t_max) && (temp > t_min) {
 
-                let p = r.point_at_parameter(temp);
+                let pos = r.point_at_parameter(temp);
                 let rec = HitRecord {
                     t: temp,
-                    p,
-                    normal: (p - self.center(r.time())) / self.radius,
+                    p: pos,
+                    normal: (pos - self.center(r.time())) / self.radius,
                     material: self.material };
 
                 return Some(rec)
@@ -118,5 +132,23 @@ impl Hitable for MovableSphere {
         }
 
         None
+    }
+
+    fn bounding_box(&self, t0: f32, t1: f32) -> Option<AABB> {
+        let aabb0 = AABB::new(
+            self.center(t0) - Vec3::new(self.radius, self.radius, self.radius),
+            self.center(t0) + Vec3::new(self.radius, self.radius, self.radius),
+        );
+
+        let aabb1 = AABB::new(
+            self.center(t1) - Vec3::new(self.radius, self.radius, self.radius),
+            self.center(t1) + Vec3::new(self.radius, self.radius, self.radius),
+        );
+
+        Some(surrounding_box(&aabb0, &aabb1))
+    }
+
+    fn clone_to_box(&self) -> Box<dyn Hitable> {
+        Box::new(*self)
     }
 }

@@ -69,9 +69,11 @@ impl Scatterable for Metal {
         let reflected = reflect(unit_vector, rec.normal);
         let scattered = Ray::new(rec.p, reflected, r_in.time());
                 
-        match dot(scattered.direction(), rec.normal) > 0.0 {
-            true => Some((self.albedo, scattered)),
-            false => None,
+        if  dot(scattered.direction(), rec.normal) > 0.0 {
+            Some((self.albedo, scattered))
+        }
+        else {
+            None
         }
     }
 }
