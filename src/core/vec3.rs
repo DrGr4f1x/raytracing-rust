@@ -210,8 +210,7 @@ impl Div<f32> for Vec3 {
     type Output = Vec3;
 
     fn div(self, rhs: f32) -> Self {
-        let k: f32 = 1.0 / rhs;
-        Vec3 { e: [self.x() * k, self.y() * k, self.z() * k] }
+        Vec3 { e: [self.x() / rhs, self.y() / rhs, self.z() / rhs] }
     }
 }
 
